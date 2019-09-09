@@ -43,6 +43,13 @@ defmodule Issues.CLI do
 
     def process ([project, user, count]) do
         Issues.GitHubIssues.fetch(project, user)
+        |> decode_response
     end
+
+    def decode_response ({:ok, body}), do: body
+    def decode_response ({:error, error}) do
+        IO.puts "fucking error #{error["message"]}"
+        System.halt(2)
+    end    
     
 end
