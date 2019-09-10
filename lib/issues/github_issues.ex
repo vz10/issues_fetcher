@@ -8,14 +8,19 @@ defmodule Issues.GitHubIssues do
     end
 
     def issues_url(user, project) do
-        "https://api.github.com/repos/#{user}/#{project}/issues"
+        "#{Application.fetch_env!(:issues, :git_hub)}#{user}/#{project}/issues"
     end
 
     def handle_response({_, %{status_code: status_code, body: body}}) do
         {
             status_code |> check_for_error,
-            body |> Poison.Parser.parse
+            body |> parser
         }
+    end
+
+    def parser(body) do
+        {:ok, result} = Poison.Parser.parse(body)
+        result
     end
 
     def check_for_error(200), do: :ok

@@ -44,9 +44,14 @@ defmodule Issues.CLI do
     def process ([project, user, count]) do
         Issues.GitHubIssues.fetch(project, user)
         |> decode_response
+        |> Enum.take(count)
     end
 
-    def decode_response ({:ok, body}), do: body
+    def decode_response ({:ok, body}) do
+        body
+        |> Enum.sort(&(&1["created_at"] >= &2["created_at"]))
+    end
+
     def decode_response ({:error, error}) do
         IO.puts "fucking error #{error["message"]}"
         System.halt(2)
